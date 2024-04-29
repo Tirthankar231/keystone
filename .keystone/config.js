@@ -49,88 +49,50 @@ var lists = {
         isIndexed: "unique"
       }),
       password: (0, import_fields.password)({ validation: { isRequired: true } }),
-      // we can use this field to see what Posts this User has authored
-      //   more on that in the Post list below
-      posts: (0, import_fields.relationship)({ ref: "Post.author", many: true }),
       createdAt: (0, import_fields.timestamp)({
         // this sets the timestamp to Date.now() when the user is first created
         defaultValue: { kind: "now" }
       })
     }
   }),
-  Post: (0, import_core.list)({
-    // WARNING
-    //   for this starter project, anyone can create, query, update and delete anything
-    //   if you want to prevent random people on the internet from accessing your data,
-    //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
+   Order: (0, import_core.list)({
     access: import_access.allowAll,
-    // this is the fields for our Post list
     fields: {
-      title: (0, import_fields.text)({ validation: { isRequired: true } }),
-      // the document field can be used for making rich editable content
-      //   you can find out more at https://keystonejs.com/docs/guides/document-fields
-      content: (0, import_fields_document.document)({
-        formatting: true,
-        layouts: [
-          [1, 1],
-          [1, 1, 1],
-          [2, 1],
-          [1, 2],
-          [1, 2, 1]
-        ],
-        links: true,
-        dividers: true
-      }),
-      // with this field, you can set a User as the author for a Post
-      author: (0, import_fields.relationship)({
-        // we could have used 'User', but then the relationship would only be 1-way
-        ref: "User.posts",
-        // this is some customisations for changing how this will look in the AdminUI
-        ui: {
-          displayMode: "cards",
-          cardFields: ["name", "email"],
-          inlineEdit: { fields: ["name", "email"] },
-          linkToItem: true,
-          inlineConnect: true
-        },
-        // a Post can only have one author
-        //   this is the default, but we show it here for verbosity
-        many: false
-      }),
-      // with this field, you can add some Tags to Posts
-      tags: (0, import_fields.relationship)({
-        // we could have used 'Tag', but then the relationship would only be 1-way
-        ref: "Tag.posts",
-        // a Post can have many Tags, not just one
-        many: true,
-        // this is some customisations for changing how this will look in the AdminUI
-        ui: {
-          displayMode: "cards",
-          cardFields: ["name"],
-          inlineEdit: { fields: ["name"] },
-          linkToItem: true,
-          inlineConnect: true,
-          inlineCreate: { fields: ["name"] }
-        }
-      })
+      orderId: (0, import_fields.text)({ validation: { isRequired: true } }),
+      currency: (0, import_fields.text)({ validation: { isRequired: true } }),
+      value: (0, import_fields.integer)({ validation: { isRequired: true } }),
+      bff: (0, import_fields.text)(),
+      collectedBy: (0, import_fields.text)(),
+      paymentType: (0, import_fields.text)({ validation: { isRequired: true } }),
+      createdAt: (0, import_fields.timestamp)({ defaultValue: { kind: "now" } }),
+      state: (0, import_fields.text)({ validation: { isRequired: true } }),
+      updatedAt: (0, import_fields.timestamp)({ defaultValue: { kind: "now" } }),
+      // Establishing N:1 relationship with Seller
+      seller: (0, import_fields.relationship)({ ref: "Seller.orders", many: false }),
+      // Establishing 1:1 relationship with Settlement_Details
+      settlementDetails: (0, import_fields.relationship)({ ref: "Settlement_Details.order", many: false })
     }
   }),
-  // this last list is our Tag list, it only has a name field for now
-  Tag: (0, import_core.list)({
-    // WARNING
-    //   for this starter project, anyone can create, query, update and delete anything
-    //   if you want to prevent random people on the internet from accessing your data,
-    //   you can find out more at https://keystonejs.com/docs/guides/auth-and-access-control
+  Seller: (0, import_core.list)({
     access: import_access.allowAll,
-    // setting this to isHidden for the user interface prevents this list being visible in the Admin UI
-    ui: {
-      isHidden: true
-    },
-    // this is the fields for our Tag list
     fields: {
-      name: (0, import_fields.text)(),
-      // this can be helpful to find out all the Posts associated with a Tag
-      posts: (0, import_fields.relationship)({ ref: "Post.tags", many: true })
+      gst: (0, import_fields.text)(),
+      pan: (0, import_fields.text)(),
+      bpp_id: (0, import_fields.text)(),
+      name: (0, import_fields.text)({ validation: { isRequired: true } }),
+      // Establishing 1:N relationship with Order
+      orders: (0, import_fields.relationship)({ ref: "Order.seller", many: true })
+    }
+  }),
+  Settlement_Details: (0, import_core.list)({
+    access: import_access.allowAll,
+    fields: {
+      settlementType: (0, import_fields.text)({ validation: { isRequired: true } }),
+      accountNo: (0, import_fields.text)(),
+      bankName: (0, import_fields.text)(),
+      branchName: (0, import_fields.text)(),
+      // Establishing 1:1 relationship with Order
+      order: (0, import_fields.relationship)({ ref: "Order.settlementDetails", many: false })
     }
   })
 };
